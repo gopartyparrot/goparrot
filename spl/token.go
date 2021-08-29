@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"log"
 	"math"
 	"time"
 
@@ -164,6 +165,7 @@ func (c *TokenProgram) ConfirmTx(txid string) (*rpc.GetConfirmedTransactionRespo
 
 	for {
 		// TODO: handle RPC error
+		log.Println("confirming:", txid)
 		res, err := c.Client.GetTransaction(c.Ctx, txid, rpc.GetTransactionWithLimitConfig{})
 
 		if err != nil {

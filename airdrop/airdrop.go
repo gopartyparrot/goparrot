@@ -122,11 +122,12 @@ func (s *BatchSender) Transfer(req TransferRequest) error {
 	}
 
 	if !found {
-		log.Println("submit:", req)
 		txid, err := s.atp.Transfer(req.Mint, s.wallet, req.To, req.Amount)
 		if err != nil {
 			return err
 		}
+
+		log.Println("submitted tx:", req, txid)
 
 		status = TransferStatus{
 			TXID:            txid,
@@ -144,7 +145,6 @@ func (s *BatchSender) Transfer(req TransferRequest) error {
 		return nil
 	}
 
-	log.Println("confirming:", req)
 	txres, err := s.atp.ConfirmTx(status.TXID)
 	if err != nil {
 		return err
