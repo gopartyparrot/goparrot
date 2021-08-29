@@ -27,6 +27,7 @@ func OpenJSONStore(filePath string) (*JSONStore, error) {
 		}
 	} else {
 		if len(data) == 0 {
+			// accept empty file
 			kv = make(map[string]json.RawMessage)
 		} else {
 			err := json.Unmarshal(data, &kv)
