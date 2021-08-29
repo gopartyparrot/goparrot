@@ -8,7 +8,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/gopartyparrot/parrot/airdrop"
+	"github.com/gopartyparrot/goparrot/airdrop"
 )
 
 type JSONStreamer struct {

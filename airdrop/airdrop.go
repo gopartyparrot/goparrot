@@ -7,7 +7,7 @@ import (
 	"log"
 	"sync"
 
-	"github.com/gopartyparrot/parrot/spl"
+	"github.com/gopartyparrot/goparrot/spl"
 	"github.com/portto/solana-go-sdk/client"
 	"github.com/portto/solana-go-sdk/common"
 	"github.com/portto/solana-go-sdk/types"

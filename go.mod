@@ -1,4 +1,4 @@
-module github.com/gopartyparrot/parrot
+module github.com/gopartyparrot/goparrot
 
 go 1.15
 
