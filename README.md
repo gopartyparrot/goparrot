@@ -23,10 +23,15 @@ line is a JSON object:
 - mint: to tokene to send
 
 ```json
-{"memo":"abcd","amount":1000000,"to":"C23a3jPhw84hy6mRAhBbNhjgzSuGFcGeNExCCBe1bHSM","mint":"4ZqfC84c1qgMnLgjeoi5tPfpmvHhinvhQSYjfYGLjaDT"}
-{"memo":"abcd","amount":2000000,"to":"C23a3jPhw84hy6mRAhBbNhjgzSuGFcGeNExCCBe1bHSM","mint":"4ZqfC84c1qgMnLgjeoi5tPfpmvHhinvhQSYjfYGLjaDT"}
-{"memo":"abcd","amount":3000000,"to":"C23a3jPhw84hy6mRAhBbNhjgzSuGFcGeNExCCBe1bHSM","mint":"4ZqfC84c1qgMnLgjeoi5tPfpmvHhinvhQSYjfYGLjaDT"}
-{"memo":"abcd","amount":4000000,"to":"C23a3jPhw84hy6mRAhBbNhjgzSuGFcGeNExCCBe1bHSM","mint":"4ZqfC84c1qgMnLgjeoi5tPfpmvHhinvhQSYjfYGLjaDT"}
+{"memo":"abcd","amount":"1000000","to":"C23a3jPhw84hy6mRAhBbNhjgzSuGFcGeNExCCBe1bHSM","mint":"4ZqfC84c1qgMnLgjeoi5tPfpmvHhinvhQSYjfYGLjaDT"}
+{"memo":"abcd","amount":"2000000","to":"C23a3jPhw84hy6mRAhBbNhjgzSuGFcGeNExCCBe1bHSM","mint":"4ZqfC84c1qgMnLgjeoi5tPfpmvHhinvhQSYjfYGLjaDT"}
+{"memo":"abcd","amount":"3000000","to":"C23a3jPhw84hy6mRAhBbNhjgzSuGFcGeNExCCBe1bHSM","mint":"4ZqfC84c1qgMnLgjeoi5tPfpmvHhinvhQSYjfYGLjaDT"}
+{"memo":"abcd","amount":"4000000","to":"C23a3jPhw84hy6mRAhBbNhjgzSuGFcGeNExCCBe1bHSM","mint":"4ZqfC84c1qgMnLgjeoi5tPfpmvHhinvhQSYjfYGLjaDT"}
+{"memo":"abcd","amount":"5000000","to":"C23a3jPhw84hy6mRAhBbNhjgzSuGFcGeNExCCBe1bHSM","mint":"4ZqfC84c1qgMnLgjeoi5tPfpmvHhinvhQSYjfYGLjaDT"}
+{"memo":"abcd","amount":"6000000","to":"C23a3jPhw84hy6mRAhBbNhjgzSuGFcGeNExCCBe1bHSM","mint":"4ZqfC84c1qgMnLgjeoi5tPfpmvHhinvhQSYjfYGLjaDT"}
+{"memo":"abcd","amount":"7000000","to":"C23a3jPhw84hy6mRAhBbNhjgzSuGFcGeNExCCBe1bHSM","mint":"4ZqfC84c1qgMnLgjeoi5tPfpmvHhinvhQSYjfYGLjaDT"}
+{"memo":"abcd","amount":"8000000","to":"C23a3jPhw84hy6mRAhBbNhjgzSuGFcGeNExCCBe1bHSM","mint":"4ZqfC84c1qgMnLgjeoi5tPfpmvHhinvhQSYjfYGLjaDT"}
+{"memo":"abcd","amount":"9000000","to":"C23a3jPhw84hy6mRAhBbNhjgzSuGFcGeNExCCBe1bHSM","mint":"4ZqfC84c1qgMnLgjeoi5tPfpmvHhinvhQSYjfYGLjaDT"}
 ```
 
 These fields are appended together to form a unique key to make sure that
@@ -59,20 +64,20 @@ The progress of the airdrop would be saved in `airdrop.store.json`:
 ```json
 {
   "abcd:C23a3jPhw84hy6mRAhBbNhjgzSuGFcGeNExCCBe1bHSM:4ZqfC84c1qgMnLgjeoi5tPfpmvHhinvhQSYjfYGLjaDT:1000000": {
-    "TXID": "5sZF2WesY6hABwvrEzCwtXqPfqBhBDcWpx3BTBdV5UsJ3Edb8j7KjsxLNFTEiEYHcvT61WywxDaexoboNpcFCSfv",
+    "TXID": "4CR8CKoXRmnGTKews84X4x3uJZNTHZoykPHsaHvCjrm7xxhNdCzJfc4jUSn9sCTzPi3h7MMrZPvJCKywxrRy2Czb",
     "Memo": "abcd",
     "Mint": "4ZqfC84c1qgMnLgjeoi5tPfpmvHhinvhQSYjfYGLjaDT",
     "To": "C23a3jPhw84hy6mRAhBbNhjgzSuGFcGeNExCCBe1bHSM",
-    "Amount": 1000000,
-    "ConnfirmedSlot": 77330841
+    "Amount": "1000000",
+    "ConnfirmedSlot": "78421840"
   },
-  "abcd:C23a3jPhw84hy6mRAhBbNhjgzSuGFcGeNExCCBe1bHSM:4ZqfC84c1qgMnLgjeoi5tPfpmvHhinvhQSYjfYGLjaDT:10000000": {
-    "TXID": "673xRSuzg9iSr4nZz9RwcUyqEuLZ2h3sV4KoEGCRmNf2cqK6vkp72SbPSomVijuheCnBj8sWCwJNJw8yFG6eXJHh",
+  "abcd:C23a3jPhw84hy6mRAhBbNhjgzSuGFcGeNExCCBe1bHSM:4ZqfC84c1qgMnLgjeoi5tPfpmvHhinvhQSYjfYGLjaDT:2000000": {
+    "TXID": "3Z1YohqR1TU4NMDaJmSaE6F2L8tBrNebLaxV2xsdfZRqQPAUUS9W2xAvnv77awMcaBZusDJ8DLf6NdgMKzepV5k8",
     "Memo": "abcd",
     "Mint": "4ZqfC84c1qgMnLgjeoi5tPfpmvHhinvhQSYjfYGLjaDT",
     "To": "C23a3jPhw84hy6mRAhBbNhjgzSuGFcGeNExCCBe1bHSM",
-    "Amount": 10000000,
-    "ConnfirmedSlot": 77328788
+    "Amount": "2000000",
+    "ConnfirmedSlot": "78421877"
   }
 }
 ```
