@@ -17,14 +17,14 @@ type TransferRequest struct {
 	Memo   string
 	Mint   common.PublicKey
 	To     common.PublicKey
-	Amount uint64
+	Amount uint64 `json:",string"`
 }
 
 type TransferStatus struct {
 	TXID string
 	TransferRequest
 	// ConnfirmedSlot the slot where this tx had been confirmed. 0 means unconfirmed.
-	ConnfirmedSlot uint64
+	ConnfirmedSlot uint64 `json:",string"`
 }
 
 type TransferStatusStore struct {
