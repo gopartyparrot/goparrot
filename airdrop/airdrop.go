@@ -6,12 +6,15 @@ import (
 	"fmt"
 	"log"
 	"sync"
+	"sync/atomic"
 
 	"github.com/gopartyparrot/goparrot/spl"
 	"github.com/portto/solana-go-sdk/client"
 	"github.com/portto/solana-go-sdk/common"
 	"github.com/portto/solana-go-sdk/types"
 )
+
+var ErrCanceledContext = errors.New("canceled context")
 
 type TransferRequest struct {
 	Memo   string
@@ -88,15 +91,24 @@ type BatchSender struct {
 	wg sync.WaitGroup
 	// concurrency work tokens
 	wtk chan struct{}
+
+	// halt the batch sender if too many errors
+	errCount int64
 }
 
 func (s *BatchSender) Wait() {
 	s.wg.Wait()
 }
 
-func (s *BatchSender) AddTransfer(req TransferRequest) {
+func (s *BatchSender) AddTransfer(req TransferRequest) error {
 
 	s.wtk <- struct{}{}
+
+	errCount := atomic.LoadInt64(&s.errCount)
+	if errCount >= 3 {
+		return errors.New("too many transfer error")
+	}
+
 	s.wg.Add(1)
 
 	go func() {
@@ -115,9 +127,12 @@ func (s *BatchSender) AddTransfer(req TransferRequest) {
 		err := s.Transfer(req)
 
 		if err != nil {
+			atomic.AddInt64(&s.errCount, 1)
 			log.Println("transfer error:", req, err)
 		}
 	}()
+
+	return nil
 }
 
 // Transfer makes a token transfer once-only (according to request key)

@@ -75,7 +75,11 @@ loop:
 			continue
 		}
 
-		bs.AddTransfer(req)
+		err = bs.AddTransfer(req)
+		if err != nil {
+			log.Println("add transfer error:", err)
+			break loop
+		}
 
 		// check interrupt
 		select {
