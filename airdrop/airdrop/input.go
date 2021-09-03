@@ -53,6 +53,7 @@ func processJSONFlie(file string, cfg AirdropArgs) error {
 	}()
 
 	bs, err := airdrop.NewBatchSender(ctx, airdrop.BatchSenderConfig{
+		RetryError:    cfg.Retry,
 		VerifyConfirm: cfg.Verify,
 		RPCEndpoint:   cfg.RPC,
 		StorePath:     cfg.Store,

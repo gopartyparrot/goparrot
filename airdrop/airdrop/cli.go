@@ -16,6 +16,7 @@ type AirdropArgs struct {
 	InputFiles []string `arg:"positional"`
 
 	Verify      bool          `arg:"--verify" help:"verify mode"`
+	Retry       bool          `arg:"--retry" help:"retry error requests"`
 	Concurrency uint          `arg:"-c" help:"concurrent send" default:"1"`
 	Wallet      types.Account `arg:"required,env,-w" help:"wallet private key (hex)"`
 	RPC         string        `arg:"env,-r" help:"rpc url" default:"devnet"`

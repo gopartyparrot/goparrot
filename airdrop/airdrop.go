@@ -50,6 +50,7 @@ type BatchSenderConfig struct {
 	Wallet        types.Account
 	Concurrency   uint
 	VerifyConfirm bool
+	RetryError    bool
 }
 
 func NewBatchSender(ctx context.Context, cfg BatchSenderConfig) (*BatchSender, error) {
@@ -153,18 +154,23 @@ func (s *BatchSender) Transfer(req TransferRequest) error {
 		return err
 	}
 
-	if !found && s.cfg.VerifyConfirm {
-		// don't create new transactions in verify mode
+	if !found && (s.cfg.VerifyConfirm || s.cfg.RetryError) {
+		// don't create new transactions in verify or retry
 		return nil
 	}
 
-	if !found {
+	var retryError bool
+	if found {
+		retryError = s.cfg.RetryError && status.ErrLogs != ""
+	}
+
+	if !found || retryError {
 		txid, err := s.atp.Transfer(req.Mint, s.wallet, req.To, req.Amount)
 		if err != nil {
 			return err
 		}
 
-		log.Println("submitted tx:", req, txid)
+		log.Println("submitted tx:", key, txid)
 
 		status = TransferStatus{
 			TXID:            txid,
