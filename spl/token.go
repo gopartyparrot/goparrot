@@ -159,21 +159,22 @@ func (c *TokenProgram) Balance(addr common.PublicKey) (uint64, error) {
 	return account.Amount, nil
 }
 
-func (c *TokenProgram) ConfirmTx(txid string) (*rpc.GetConfirmedTransactionResponse, error) {
+func (c *TokenProgram) ConfirmTx(ctx context.Context, txid string) (*rpc.GetConfirmedTransactionResponse, error) {
 	// TODO: have a way to specify option
 	// TODO: be able tto just pollig interval?
 
 	for {
 		// TODO: handle RPC error
 		log.Println("confirming:", txid)
-		res, err := c.Client.GetTransaction(c.Ctx, txid, rpc.GetTransactionWithLimitConfig{})
+		res, err := c.Client.GetConfirmedTransaction(ctx, txid)
+		// res, err := c.Client.GetTransaction(ctx, txid, rpc.GetTransactionWithLimitConfig{})
 
 		if err != nil {
 			return nil, err
 		}
 
 		if res.Slot == 0 {
-			time.Sleep(time.Millisecond * 1000)
+			time.Sleep(time.Millisecond * 5000)
 			continue
 		}
 

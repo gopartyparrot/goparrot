@@ -2,11 +2,13 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"os"
+	"os/signal"
 
 	"github.com/gopartyparrot/goparrot/airdrop"
 )
@@ -31,13 +33,26 @@ func (s *JSONStreamer) Next(v interface{}) error {
 }
 
 func processJSONFlie(file string, cfg AirdropArgs) error {
+	signalC := make(chan os.Signal, 1)
+	signal.Notify(signalC, os.Interrupt)
+
 	f, err := os.Open(file)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
 
-	bs, err := airdrop.NewBatchSender(airdrop.BatchSenderConfig{
+	ctx, cancel := context.WithCancel(context.Background())
+
+	go func() {
+		for {
+			<-signalC
+			log.Println("SIGINT. Wait for tasks to exit gracefully")
+			cancel()
+		}
+	}()
+
+	bs, err := airdrop.NewBatchSender(ctx, airdrop.BatchSenderConfig{
 		RPCEndpoint: cfg.RPC,
 		StorePath:   cfg.Store,
 		Wallet:      cfg.Wallet,
@@ -49,6 +64,7 @@ func processJSONFlie(file string, cfg AirdropArgs) error {
 
 	s := NewJSONStreamer(f)
 	var lineno int
+loop:
 	for s.Scan() {
 		lineno++
 		var req airdrop.TransferRequest
@@ -59,6 +75,13 @@ func processJSONFlie(file string, cfg AirdropArgs) error {
 		}
 
 		bs.AddTransfer(req)
+
+		// check interrupt
+		select {
+		case <-ctx.Done():
+			break loop
+		default:
+		}
 	}
 
 	bs.Wait()

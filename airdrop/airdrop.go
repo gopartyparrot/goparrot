@@ -47,16 +47,15 @@ type BatchSenderConfig struct {
 	Concurrency uint
 }
 
-func NewBatchSender(cfg BatchSenderConfig) (*BatchSender, error) {
+func NewBatchSender(ctx context.Context, cfg BatchSenderConfig) (*BatchSender, error) {
 	store, err := OpenJSONStore(cfg.StorePath)
 	if err != nil {
 		return nil, err
 	}
 
-	ctx := context.TODO()
-
+	clientCtx := context.TODO()
 	c := client.NewClient(cfg.RPCEndpoint)
-	tp := spl.TokenProgram{Ctx: ctx, Client: c}
+	tp := spl.TokenProgram{Ctx: clientCtx, Client: c}
 	atp := &spl.AssociatedTokenProgram{TokenProgram: tp}
 
 	concurrency := cfg.Concurrency
@@ -65,6 +64,7 @@ func NewBatchSender(cfg BatchSenderConfig) (*BatchSender, error) {
 	}
 
 	return &BatchSender{
+		ctx:    ctx,
 		store:  &TransferStatusStore{store},
 		atp:    atp,
 		wallet: cfg.Wallet,
@@ -76,6 +76,7 @@ func NewBatchSender(cfg BatchSenderConfig) (*BatchSender, error) {
 // BatchSender stores the transfer statuses of tranfser requests in a JSON file to make
 // ensure that each transfer request is sent & confirmed once-only.
 type BatchSender struct {
+	ctx    context.Context
 	store  *TransferStatusStore
 	atp    *spl.AssociatedTokenProgram
 	wallet types.Account
@@ -93,10 +94,22 @@ func (s *BatchSender) AddTransfer(req TransferRequest) {
 
 	s.wtk <- struct{}{}
 	s.wg.Add(1)
+
 	go func() {
+		defer func() {
+			s.wg.Done()
+			<-s.wtk
+		}()
+
+		select {
+		case <-s.ctx.Done():
+			// don't do the task, context cancelled
+			return
+		default:
+		}
+
 		err := s.Transfer(req)
-		s.wg.Done()
-		<-s.wtk
+
 		if err != nil {
 			log.Println("transfer error:", req, err)
 		}
@@ -145,9 +158,14 @@ func (s *BatchSender) Transfer(req TransferRequest) error {
 		return nil
 	}
 
-	txres, err := s.atp.ConfirmTx(status.TXID)
+	txres, err := s.atp.ConfirmTx(s.ctx, status.TXID)
 	if err != nil {
-		return err
+		return fmt.Errorf("confirm tx: %s", err)
+	}
+
+	// verify mode
+	if txres.Meta.Err != nil {
+		// record error
 	}
 
 	status.ConnfirmedSlot = txres.Slot
