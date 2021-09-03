@@ -25,6 +25,7 @@ type TransferStatus struct {
 	TransferRequest
 	// ConnfirmedSlot the slot where this tx had been confirmed. 0 means unconfirmed.
 	ConnfirmedSlot uint64 `json:",string"`
+	ErrLogs        string `json:",omitempty"`
 }
 
 type TransferStatusStore struct {
@@ -41,10 +42,11 @@ func (s *TransferStatusStore) Get(key string, status *TransferStatus) (bool, err
 }
 
 type BatchSenderConfig struct {
-	RPCEndpoint string
-	StorePath   string
-	Wallet      types.Account
-	Concurrency uint
+	RPCEndpoint   string
+	StorePath     string
+	Wallet        types.Account
+	Concurrency   uint
+	VerifyConfirm bool
 }
 
 func NewBatchSender(ctx context.Context, cfg BatchSenderConfig) (*BatchSender, error) {
@@ -64,6 +66,7 @@ func NewBatchSender(ctx context.Context, cfg BatchSenderConfig) (*BatchSender, e
 	}
 
 	return &BatchSender{
+		cfg:    cfg,
 		ctx:    ctx,
 		store:  &TransferStatusStore{store},
 		atp:    atp,
@@ -76,6 +79,7 @@ func NewBatchSender(ctx context.Context, cfg BatchSenderConfig) (*BatchSender, e
 // BatchSender stores the transfer statuses of tranfser requests in a JSON file to make
 // ensure that each transfer request is sent & confirmed once-only.
 type BatchSender struct {
+	cfg    BatchSenderConfig
 	ctx    context.Context
 	store  *TransferStatusStore
 	atp    *spl.AssociatedTokenProgram
@@ -134,6 +138,11 @@ func (s *BatchSender) Transfer(req TransferRequest) error {
 		return err
 	}
 
+	if !found && s.cfg.VerifyConfirm {
+		// don't create new transactions in verify mode
+		return nil
+	}
+
 	if !found {
 		txid, err := s.atp.Transfer(req.Mint, s.wallet, req.To, req.Amount)
 		if err != nil {
@@ -153,7 +162,7 @@ func (s *BatchSender) Transfer(req TransferRequest) error {
 		}
 	}
 
-	if status.ConnfirmedSlot > 0 {
+	if status.ConnfirmedSlot > 0 && !s.cfg.VerifyConfirm {
 		// already confirmed
 		return nil
 	}
@@ -165,7 +174,7 @@ func (s *BatchSender) Transfer(req TransferRequest) error {
 
 	// verify mode
 	if txres.Meta.Err != nil {
-		// record error
+		status.ErrLogs = fmt.Sprintf("error: %v", txres.Meta.LogMessages)
 	}
 
 	status.ConnfirmedSlot = txres.Slot
